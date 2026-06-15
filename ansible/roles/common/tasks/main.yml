@@ -1,0 +1,50 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install common packages
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Disable active swap
+  ansible.builtin.command: swapoff -a
+  changed_when: ansible_swaptotal_mb | int > 0
+  when: ansible_swaptotal_mb | int > 0
+
+- name: Disable swap entries in fstab
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#]\S+\s+\S+\s+swap\s+.*)$'
+    replace: '# \1'
+
+- name: Persist Kubernetes kernel modules
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/k3s.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {% for module in kubernetes_kernel_modules %}
+      {{ module }}
+      {% endfor %}
+
+- name: Load Kubernetes kernel modules
+  ansible.builtin.command: "modprobe {{ item }}"
+  changed_when: false
+  loop: "{{ kubernetes_kernel_modules }}"
+
+- name: Persist Kubernetes sysctl settings
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-k3s.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {% for key, value in kubernetes_sysctl_settings.items() %}
+      {{ key }} = {{ value }}
+      {% endfor %}
+  notify: Reload sysctl
+

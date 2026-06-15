@@ -1,0 +1,41 @@
+services:
+  terraform:
+    # Официальный образ Terraform. Версия зафиксирована, чтобы init/plan/apply
+    # выполнялись одинаково на разных рабочих станциях администратора.
+    image: hashicorp/terraform:1.12
+
+    # Внутри контейнера проект доступен в /workspace.
+    working_dir: /workspace
+
+    # Позволяет писать команды короче:
+    # docker compose run --rm terraform plan
+    # вместо docker compose run --rm terraform terraform plan.
+    entrypoint: ["terraform"]
+
+    # .env не коммитится в Git и содержит реальные данные доступа к Proxmox.
+    env_file:
+      - .env
+
+    # Переменные с префиксом TF_VAR_ автоматически становятся Terraform variables.
+    environment:
+      TF_VAR_proxmox_api_url: ${PROXMOX_API_URL}
+      TF_VAR_proxmox_user: ${PROXMOX_USER}
+      TF_VAR_proxmox_password: ${PROXMOX_PASSWORD}
+      TF_VAR_proxmox_node: ${PROXMOX_NODE}
+      TF_VAR_proxmox_ssh_username: ${PROXMOX_SSH_USERNAME}
+      TF_VAR_proxmox_ssh_node_address: ${PROXMOX_SSH_NODE_ADDRESS}
+
+      # Полезно в сетях, где Terraform Registry доступен только через proxy/VPN.
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-}
+      TF_REGISTRY_CLIENT_TIMEOUT: ${TF_REGISTRY_CLIENT_TIMEOUT:-60}
+
+    user: 1000:1000
+
+    # Монтируем текущую директорию, чтобы Terraform видел *.tf, *.tfvars и state.
+    volumes:
+      - ./:/workspace
+      - /home/roshc:/home/roshc:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/volume:/etc/volume:ro

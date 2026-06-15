@@ -1,0 +1,31 @@
+# Разрешает подключение к Proxmox с самоподписанным TLS-сертификатом.
+proxmox_tls_insecure = true
+
+# Storage-параметры. Обычно диски ВМ лежат в local-lvm, а image/snippets в local.
+disk_storage       = "local-lvm"
+image_storage      = "local"
+snippets_storage   = "local"
+cloud_init_storage = "local-lvm"
+network_bridge     = "vmbr0"
+
+# Умеренная конфигурация под хост с 16 GB RAM и 16 vCPU.
+vm_count        = 3
+vm_cpu_cores    = 2
+vm_memory_mb    = 2048
+vm_disk_size_gb = 35
+vm_base_name    = "k3s"
+vm_username     = "victor"
+vm_id_start     = 300
+
+ansible_ssh_private_key_file = "~/.ssh/id_rsa"
+ansible_inventory_path       = "ansible/inventories/generated/hosts.yml"
+
+# Ubuntu 24.04 Noble cloud image. ОС будет готова без ручной установки с ISO.
+cloud_image_url       = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+cloud_image_file_name = "noble-server-cloudimg-amd64.img"
+
+# Публичный ключ будет прочитан Terraform и добавлен в authorized_keys victor и root.
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+
+# DNS попадут в cloud-init network configuration.
+dns_servers = ["1.1.1.1", "8.8.8.8"]

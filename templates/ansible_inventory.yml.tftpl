@@ -1,0 +1,22 @@
+all:
+  children:
+    k3s_master:
+      hosts:
+%{ for host in masters ~}
+        ${host.alias}:
+          hostname: ${host.hostname}
+          ansible_host: ${host.ip}
+          ansible_user: ${ansible_user}
+          ansible_ssh_private_key_file: ${ansible_ssh_private_key_file}
+%{ endfor ~}
+
+    k3s_workers:
+      hosts:
+%{ for host in workers ~}
+        ${host.alias}:
+          hostname: ${host.hostname}
+          ansible_host: ${host.ip}
+          ansible_user: ${ansible_user}
+          ansible_ssh_private_key_file: ${ansible_ssh_private_key_file}
+%{ endfor ~}
+
