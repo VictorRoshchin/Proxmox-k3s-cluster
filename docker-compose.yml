@@ -33,7 +33,7 @@ services:
 
     user: 1000:1000
 
-    # Монтируем текущую директорию, чтобы Terraform видел *.tf, *.tfvars и state.
+    # Монтируем текущую директорию; Terraform запускается из terraform/ через -chdir.
     volumes:
       - ./:/workspace
       - /home/roshc:/home/roshc:ro

@@ -1,17 +1,37 @@
 ---
+common_apt_cache_valid_time: 3600
+
 common_packages:
+  - apt-transport-https
+  - ca-certificates
   - curl
-  - vim
-  - jq
+  - gnupg
   - git
   - htop
+  - jq
+  - vim
+
+common_extra_packages: []
+
+common_manage_timezone: true
+common_timezone: Asia/Yekaterinburg
+
+common_manage_time_sync: true
+common_time_sync_package: systemd-timesyncd
+common_time_sync_service: systemd-timesyncd
+
+common_disable_swap: true
+
+common_manage_kubernetes_kernel_modules: true
 
 kubernetes_kernel_modules:
   - overlay
   - br_netfilter
 
+common_manage_kubernetes_sysctl: true
+common_kubernetes_sysctl_file: /etc/sysctl.d/99-k3s.conf
+
 kubernetes_sysctl_settings:
   net.bridge.bridge-nf-call-iptables: "1"
   net.bridge.bridge-nf-call-ip6tables: "1"
   net.ipv4.ip_forward: "1"
-

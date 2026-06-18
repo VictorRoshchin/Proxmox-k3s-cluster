@@ -17,11 +17,12 @@
   hosts: k3s_master
   become: false
   gather_facts: false
+  serial: 1
   tasks:
     - name: Wait for Kubernetes API port on master
       ansible.builtin.wait_for:
-        host: "{{ ansible_host }}"
-        port: "{{ k3s_api_port }}"
+        host: "{{ hostvars[inventory_hostname].ansible_host }}"
+        port: "{{ hostvars[inventory_hostname].k3s_api_port | default(6443) }}"
         timeout: 180
       delegate_to: localhost
 
@@ -29,6 +30,7 @@
   hosts: k3s_workers
   become: true
   gather_facts: true
+  serial: 1
   roles:
     - k3s_agent
 
@@ -50,4 +52,3 @@
     - name: Show cluster nodes
       ansible.builtin.debug:
         msg: "{{ k3s_nodes.stdout_lines }}"
-

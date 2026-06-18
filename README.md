@@ -30,23 +30,24 @@ Terraform создаёт VM из Ubuntu cloud image, ждёт IP-адреса ч
 │   ├── README.md
 │   ├── terraform/
 │   └── k3s/
-├── templates/
+├── terraform/
+│   ├── modules/
+│   │   └── proxmox-cloud-vm/
+│   ├── templates/
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── providers.tf
+│   ├── variables.tf
+│   └── terraform.tfvars.example
 ├── docker-compose.yml
-├── main.tf
-├── outputs.tf
-├── providers.tf
-├── variables.tf
-├── terraform.tfvars.example
 └── Makefile
 ```
 
 | Путь | Назначение |
 |---|---|
-| `main.tf` | Proxmox VM, cloud-init snippets, генерация Ansible inventory |
-| `providers.tf` | требования к Terraform и providers |
-| `variables.tf` | входные переменные |
-| `outputs.tf` | Terraform outputs |
-| `templates/` | шаблоны Terraform, включая inventory |
+| `terraform/` | root module Terraform и локальный state |
+| `terraform/modules/proxmox-cloud-vm/` | reusable модуль Ubuntu VM для k3s и standalone VM |
+| `terraform/templates/` | шаблоны Terraform, включая inventory |
 | `ansible/` | playbook, roles, group_vars и generated inventory |
 | `docs/` | база знаний по Terraform и K3s |
 | `Makefile` | основные команды проекта |
@@ -66,16 +67,16 @@ Terraform создаёт VM из Ubuntu cloud image, ждёт IP-адреса ч
 
 ```bash
 cp .env.example .env
-cp terraform.tfvars.example terraform.tfvars
+cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 ```
 
-Заполните `.env` доступами к Proxmox и проверьте в `terraform.tfvars`:
+Заполните `.env` доступами к Proxmox и проверьте в `terraform/terraform.tfvars`:
 
 ```hcl
 vm_username                  = "victor"
 ssh_public_key_path          = "~/.ssh/id_rsa.pub"
 ansible_ssh_private_key_file = "~/.ssh/id_rsa"
-ansible_inventory_path       = "ansible/inventories/generated/hosts.yml"
+ansible_inventory_path       = "../ansible/inventories/generated/hosts.yml"
 ```
 
 Развернуть инфраструктуру и K3s:
@@ -116,10 +117,10 @@ make deploy
 | Файл | Назначение |
 |---|---|
 | `.env` | Proxmox API/SSH параметры для Docker Compose |
-| `terraform.tfvars` | значения Terraform variables |
-| `ansible/group_vars/all.yml` | общие Ansible-переменные |
-| `ansible/group_vars/k3s_master.yml` | переменные master-группы |
-| `ansible/group_vars/k3s_workers.yml` | переменные worker-группы |
+| `terraform/terraform.tfvars` | значения Terraform variables |
+| `ansible/inventories/group_vars/all.yml` | общие Ansible-переменные |
+| `ansible/inventories/group_vars/k3s_master.yml` | переменные master-группы |
+| `ansible/inventories/group_vars/k3s_workers.yml` | переменные worker-группы |
 
 Terraform генерирует inventory:
 
@@ -129,6 +130,17 @@ ansible/inventories/generated/hosts.yml
 
 Этот файл не редактируется вручную и не хранится в Git.
 
+## Standalone VM для Vault и другого софта
+
+Создание VM вынесено в reusable модуль `terraform/modules/proxmox-cloud-vm/`. Root module использует его дважды:
+
+- `module.k3s_vms` создаёт master/worker VM для K3s;
+- `module.standalone_vms` создаёт VM вне K3s-кластера.
+
+Такой подход удобен, если Vault, CI/CD runner, monitoring или другой системный сервис нужно держать отдельно от Kubernetes. Standalone VM не попадает в `ansible/inventories/generated/hosts.yml`, потому что этот inventory предназначен только для playbook установки K3s.
+
+Пример VM для Vault уже есть в `terraform/terraform.tfvars.example`. Чтобы создать её, перенесите блок `standalone_vms` в `terraform/terraform.tfvars` и задайте уникальный `vm_id`.
+
 ## Выходные значения Terraform
 
 | Output | Описание |
@@ -137,6 +149,7 @@ ansible/inventories/generated/hosts.yml
 | `master_ip` | IPv4 адрес K3s server node |
 | `worker_ips` | IPv4 адреса K3s agent nodes |
 | `inventory_path` | путь к generated Ansible inventory |
+| `standalone_vms` | standalone VM вне K3s, например будущая VM для Vault |
 
 Показать outputs:
 

@@ -18,14 +18,30 @@ vm_username     = "victor"
 vm_id_start     = 300
 
 ansible_ssh_private_key_file = "~/.ssh/id_rsa"
-ansible_inventory_path       = "ansible/inventories/generated/hosts.yml"
+ansible_inventory_path       = "../ansible/inventories/generated/hosts.yml"
 
-# Ubuntu 24.04 Noble cloud image. ОС будет готова без ручной установки с ISO.
+# URL Ubuntu заканчивается на .img, но Proxmox import storage требует корректное
+# имя импортируемого диска с расширением .qcow2.
 cloud_image_url       = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
-cloud_image_file_name = "noble-server-cloudimg-amd64.img"
+cloud_image_file_name = "noble-server-cloudimg-amd64.qcow2"
 
 # Публичный ключ будет прочитан Terraform и добавлен в authorized_keys victor и root.
 ssh_public_key_path = "~/.ssh/id_rsa.pub"
 
 # DNS попадут в cloud-init network configuration.
 dns_servers = ["1.1.1.1", "8.8.8.8"]
+
+# Пример standalone VM для Vault или другого софта вне k3s.
+# Раскомментируйте блок, если хотите создать отдельную VM.
+# standalone_vms = {
+#   vault-1 = {
+#     name         = "vault-1"
+#     role         = "vault"
+#     vm_id        = 400
+#     cpu_cores    = 2
+#     memory_mb    = 2048
+#     disk_size_gb = 30
+#     description  = "Standalone VM for HashiCorp Vault."
+#     tags         = ["vault"]
+#   }
+# }

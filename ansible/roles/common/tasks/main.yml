@@ -2,23 +2,52 @@
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: true
-    cache_valid_time: 3600
+    cache_valid_time: "{{ common_apt_cache_valid_time }}"
 
 - name: Install common packages
   ansible.builtin.apt:
-    name: "{{ common_packages }}"
+    name: "{{ common_packages + common_extra_packages }}"
     state: present
+
+- name: Read current timezone
+  ansible.builtin.command: timedatectl show --property=Timezone --value
+  register: common_current_timezone
+  changed_when: false
+  when: common_manage_timezone
+
+- name: Configure timezone
+  ansible.builtin.command: "timedatectl set-timezone {{ common_timezone }}"
+  changed_when: true
+  when:
+    - common_manage_timezone
+    - common_current_timezone.stdout != common_timezone
+
+- name: Install time synchronization package
+  ansible.builtin.apt:
+    name: "{{ common_time_sync_package }}"
+    state: present
+  when: common_manage_time_sync
+
+- name: Enable time synchronization service
+  ansible.builtin.service:
+    name: "{{ common_time_sync_service }}"
+    enabled: true
+    state: started
+  when: common_manage_time_sync
 
 - name: Disable active swap
   ansible.builtin.command: swapoff -a
   changed_when: ansible_swaptotal_mb | int > 0
-  when: ansible_swaptotal_mb | int > 0
+  when:
+    - common_disable_swap
+    - ansible_facts["swaptotal_mb"] | int > 0
 
 - name: Disable swap entries in fstab
   ansible.builtin.replace:
     path: /etc/fstab
     regexp: '^([^#]\S+\s+\S+\s+swap\s+.*)$'
     replace: '# \1'
+  when: common_disable_swap
 
 - name: Persist Kubernetes kernel modules
   ansible.builtin.copy:
@@ -30,15 +59,17 @@
       {% for module in kubernetes_kernel_modules %}
       {{ module }}
       {% endfor %}
+  when: common_manage_kubernetes_kernel_modules
 
 - name: Load Kubernetes kernel modules
   ansible.builtin.command: "modprobe {{ item }}"
   changed_when: false
   loop: "{{ kubernetes_kernel_modules }}"
+  when: common_manage_kubernetes_kernel_modules
 
 - name: Persist Kubernetes sysctl settings
   ansible.builtin.copy:
-    dest: /etc/sysctl.d/99-k3s.conf
+    dest: "{{ common_kubernetes_sysctl_file }}"
     owner: root
     group: root
     mode: "0644"
@@ -47,4 +78,4 @@
       {{ key }} = {{ value }}
       {% endfor %}
   notify: Reload sysctl
-
+  when: common_manage_kubernetes_sysctl

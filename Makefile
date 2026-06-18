@@ -1,4 +1,4 @@
-TERRAFORM ?= docker compose run --rm terraform
+TERRAFORM ?= docker compose run --rm terraform -chdir=terraform
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_INVENTORY ?= ansible/inventories/generated/hosts.yml
 ANSIBLE_PLAYBOOK_FILE ?= ansible/playbooks/site.yml
@@ -23,7 +23,7 @@ apply:
 
 ansible:
 	test -f $(ANSIBLE_INVENTORY)
-	cd ansible && $(ANSIBLE_PLAYBOOK) -i inventories/generated/hosts.yml playbooks/site.yml
+	cd ansible && $(ANSIBLE_PLAYBOOK) -i inventories/hosts.yml -i inventories/generated/hosts.yml playbooks/site.yml
 
 deploy: init apply ansible
 

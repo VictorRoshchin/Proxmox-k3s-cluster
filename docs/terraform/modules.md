@@ -26,13 +26,14 @@ Module — директория с Terraform-файлами. Любая Terrafor
 
 Root module — текущая директория, из которой запускается Terraform.
 
-В этом проекте root module находится в корне репозитория:
+В этом проекте root module находится в директории `terraform/`:
 
 ```text
-main.tf
-providers.tf
-variables.tf
-outputs.tf
+terraform/
+├── main.tf
+├── providers.tf
+├── variables.tf
+└── outputs.tf
 ```
 
 ## Child modules
@@ -41,7 +42,7 @@ Child module вызывается из root module:
 
 ```hcl
 module "vm" {
-  source = "./modules/proxmox-vm"
+  source = "./modules/proxmox-cloud-vm"
   name   = "k3s-master-1"
 }
 ```
@@ -63,14 +64,20 @@ module "vpc" {
 
 ## Модули в этом проекте
 
-Отдельных child modules сейчас нет. Это осознанно приемлемо: проект небольшой, создаёт один тип инфраструктуры и легче читается как root module.
+В проекте выделен child module `terraform/modules/proxmox-cloud-vm`. Он создаёт одну Ubuntu VM из cloud image, cloud-init snippet, диск, сеть и QEMU guest agent.
+
+Root module использует его для двух групп:
+
+- `module.k3s_vms` — VM, входящие в k3s-кластер;
+- `module.standalone_vms` — VM вне k3s, например будущий сервер Vault.
 
 ```mermaid
 flowchart TD
-    A[root module] --> B[Proxmox image]
-    A --> C[Cloud-init snippets]
-    A --> D[VM resources]
-    A --> E[Local inventory file]
+    A[terraform root module] --> B[Ubuntu cloud image]
+    A --> C[module.k3s_vms]
+    A --> D[module.standalone_vms]
+    C --> E[Ansible inventory]
+    D --> F[Standalone VM outputs]
 ```
 
 ## Когда выделять модуль
@@ -83,11 +90,11 @@ flowchart TD
 - root module становится сложно читать;
 - один и тот же набор resources копируется несколько раз.
 
-Пример будущей структуры:
+Текущая структура:
 
 ```text
-modules/
-└── proxmox-vm/
+terraform/modules/
+└── proxmox-cloud-vm/
     ├── main.tf
     ├── variables.tf
     └── outputs.tf
@@ -102,4 +109,3 @@ modules/
 | Скрытые provider-настройки внутри модуля | сложнее управлять версиями и доступом |
 | Копирование модулей вместо versioning | расходятся реализации |
 | Модуль без outputs | результаты трудно использовать |
-

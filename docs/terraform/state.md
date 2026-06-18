@@ -23,7 +23,7 @@ Terraform address -> Real infrastructure object
 Пример:
 
 ```text
-proxmox_virtual_environment_vm.k3s["k3s-master-1"] -> Proxmox VMID 300
+module.k3s_vms["k3s-master-1"].proxmox_virtual_environment_vm.vm -> Proxmox VMID 300
 ```
 
 Без state Terraform не знает, какие реальные объекты были созданы этим проектом.
@@ -139,7 +139,7 @@ Remote state нужен для:
 Проект использует local backend:
 
 ```text
-terraform.tfstate
+terraform/terraform.tfstate
 ```
 
 State игнорируется Git через `.gitignore`.
@@ -154,7 +154,7 @@ State игнорируется Git через `.gitignore`.
 
 ## Best Practices
 
-- Не коммитить `terraform.tfstate`.
+- Не коммитить `terraform/terraform.tfstate`.
 - Делать резервные копии state перед крупными изменениями.
 - Не редактировать state вручную.
 - Использовать `terraform state show` для диагностики.
@@ -170,4 +170,3 @@ State игнорируется Git через `.gitignore`.
 | `state lock` не снимается | прерванный apply | проверить, нет ли активного процесса; затем аккуратно снять lock |
 | plan показывает неожиданные изменения | drift в Proxmox | сравнить Proxmox UI, state и HCL |
 | output пустой | ресурс ещё не создан или IP неизвестен | проверить QEMU guest agent и `terraform state show` |
-

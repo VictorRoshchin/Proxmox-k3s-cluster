@@ -46,7 +46,7 @@ registry.terraform.io/bpg/proxmox
 
 ## Версии и lock file
 
-Версии задаются в `providers.tf`:
+Версии задаются в `terraform/providers.tf`:
 
 ```hcl
 required_providers {

@@ -1,7 +1,5 @@
 ---
 k3s_server_install_exec: "server --write-kubeconfig-mode 0644"
-k3s_api_port: 6443
 k3s_server_service_name: k3s
 k3s_token_path: /var/lib/rancher/k3s/server/node-token
 k3s_kubeconfig_path: /etc/rancher/k3s/k3s.yaml
-

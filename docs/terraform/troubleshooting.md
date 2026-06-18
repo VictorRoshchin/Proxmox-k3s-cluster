@@ -47,4 +47,4 @@
 |---|---|---|
 | `hosts.yml` не создан | apply не дошёл до `local_file` | проверить ошибки VM/IP |
 | Ansible подключается не туда | старый generated inventory | повторить `make apply` |
-| private key path неверный | `ansible_ssh_private_key_file` не соответствует окружению | исправить `terraform.tfvars` и `make apply` |
+| private key path неверный | `ansible_ssh_private_key_file` не соответствует окружению | исправить `terraform/terraform.tfvars` и `make apply` |

@@ -13,7 +13,14 @@ flowchart TD
     E --> F[K3s components]
     F --> G[K3s operations]
     G --> H[Устранение неполадок]
+    H --> I[Roadmap]
 ```
+
+## План развития
+
+| Документ | Назначение |
+|---|---|
+| [Roadmap проекта](roadmap.md) | Технический backlog: Vault, Helm, observability, backup, GitOps и security |
 
 ## Terraform
 

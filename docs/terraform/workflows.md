@@ -34,7 +34,7 @@ make init
 
 1. читает `required_providers`;
 2. скачивает plugins;
-3. создаёт `.terraform/`;
+3. создаёт `terraform/.terraform/`;
 4. обновляет `.terraform.lock.hcl`;
 5. готовит backend.
 

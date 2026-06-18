@@ -4,17 +4,20 @@
 # Реальные tfvars могут содержать SSH-ключи, адреса и секреты.
 *.tfvars
 !terraform.tfvars.example
+!terraform/terraform.tfvars.example
 
 # Рабочая директория Terraform с загруженными provider plugins.
 .terraform/
+terraform/.terraform/
 
-# Lock-файл можно коммитить в командных проектах. В учебном pet-проекте
-# оставляем его локальным, чтобы не плодить служебные изменения.
-.terraform.lock.hcl
+# Lock-файл .terraform.lock.hcl намеренно не игнорируется:
+# он фиксирует версии providers и делает init воспроизводимым.
 
 # State содержит реальные идентификаторы ресурсов и может содержать sensitive data.
 terraform.tfstate
 terraform.tfstate.*
+terraform/terraform.tfstate
+terraform/terraform.tfstate.*
 
 # Диагностические файлы Terraform.
 crash.log

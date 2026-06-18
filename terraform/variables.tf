@@ -148,7 +148,7 @@ variable "ansible_ssh_private_key_file" {
 variable "ansible_inventory_path" {
   description = "Путь к YAML inventory, который Terraform генерирует для Ansible."
   type        = string
-  default     = "ansible/inventories/generated/hosts.yml"
+  default     = "../ansible/inventories/generated/hosts.yml"
 }
 
 variable "ssh_public_key_path" {
@@ -174,4 +174,19 @@ variable "vm_id_start" {
   description = "Начальный VMID. Каждая следующая ВМ получит VMID + 1."
   type        = number
   default     = 300
+}
+
+variable "standalone_vms" {
+  description = "Standalone VM, не входящие в k3s-кластер, например VM для Vault."
+  type = map(object({
+    name         = string
+    role         = optional(string, "standalone")
+    vm_id        = number
+    cpu_cores    = optional(number)
+    memory_mb    = optional(number)
+    disk_size_gb = optional(number)
+    description  = optional(string)
+    tags         = optional(list(string), [])
+  }))
+  default = {}
 }
