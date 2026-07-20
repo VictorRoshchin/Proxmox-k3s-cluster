@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: django-demo
+  namespace: django-demo
+  labels:
+    app.kubernetes.io/name: django-demo
+    app.kubernetes.io/component: web
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - django-demo.k3s.home.verrve.ru
+      secretName: django-demo-tls
+  rules:
+    - host: django-demo.k3s.home.verrve.ru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: django-demo
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: django-demo-http-redirect
+  namespace: django-demo
+  labels:
+    app.kubernetes.io/name: django-demo
+    app.kubernetes.io/component: ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: django-demo-django-demo-redirect-https@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: django-demo.k3s.home.verrve.ru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: django-demo
+                port:
+                  name: http

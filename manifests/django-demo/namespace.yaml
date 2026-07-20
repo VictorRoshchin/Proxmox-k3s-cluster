@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: django-demo
+  labels:
+    app.kubernetes.io/name: django-demo
+    app.kubernetes.io/part-of: django-demo

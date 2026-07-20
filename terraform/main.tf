@@ -99,7 +99,7 @@ resource "local_file" "ansible_inventory" {
   file_permission = "0644"
 
   content = templatefile("${path.module}/templates/ansible_inventory.yml.tftpl", {
-    ansible_user                 = var.vm_username
+    ansible_user                 = "root"
     ansible_ssh_private_key_file = var.ansible_ssh_private_key_file
     masters                      = local.inventory_masters
     workers                      = local.inventory_workers

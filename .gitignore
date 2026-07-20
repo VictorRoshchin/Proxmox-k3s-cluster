@@ -33,3 +33,9 @@ override.tf.json
 ansible/inventories/generated/hosts.yml
 ansible/artifacts/*
 !ansible/artifacts/.gitkeep
+
+# Local Kubernetes TLS secrets.
+manifests/**/secret.yaml
+
+# Vault runtime data, logs and sensitive bootstrap material.
+ext-datastore/

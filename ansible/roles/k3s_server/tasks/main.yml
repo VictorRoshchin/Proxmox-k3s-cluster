@@ -18,7 +18,8 @@
 - name: Install k3s server
   ansible.builtin.command: /tmp/k3s-install.sh
   environment:
-    INSTALL_K3S_EXEC: "{{ k3s_server_install_exec }} --node-name {{ hostname | default(inventory_hostname) }}"
+    K3S_NODE_NAME: "{{ hostname | default(inventory_hostname) }}"
+  #  INSTALL_K3S_EXEC: "{{ k3s_server_install_exec }}"
   args:
     creates: /usr/local/bin/k3s
   when: k3s_binary.stat.exists is false
@@ -53,7 +54,6 @@
     state: directory
     mode: "0755"
   delegate_to: localhost
-  become: false
 
 - name: Fetch kubeconfig from master
   ansible.builtin.fetch:
@@ -67,4 +67,3 @@
     regexp: 'server: https://127\.0\.0\.1:([0-9]+)'
     replace: 'server: https://{{ k3s_local_kubeconfig_server_host }}:\1'
   delegate_to: localhost
-  become: false

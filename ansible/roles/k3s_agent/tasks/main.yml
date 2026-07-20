@@ -24,7 +24,8 @@
   environment:
     K3S_URL: "https://{{ hostvars[k3s_master_host].ansible_host }}:{{ k3s_api_port | default(6443) }}"
     K3S_TOKEN: "{{ hostvars[k3s_master_host].k3s_cluster_token }}"
-    INSTALL_K3S_EXEC: "{{ k3s_agent_install_exec }} --node-name {{ hostname | default(inventory_hostname) }}"
+    K3S_NODE_NAME: "{{ hostname | default(inventory_hostname) }}"
+    #INSTALL_K3S_EXEC: "{{ k3s_agent_install_exec }}"
   args:
     creates: /usr/local/bin/k3s
   when: k3s_binary.stat.exists is false

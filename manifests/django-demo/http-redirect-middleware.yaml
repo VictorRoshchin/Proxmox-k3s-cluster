@@ -1,0 +1,12 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: django-demo-redirect-https
+  namespace: django-demo
+  labels:
+    app.kubernetes.io/name: django-demo
+    app.kubernetes.io/component: ingress
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
