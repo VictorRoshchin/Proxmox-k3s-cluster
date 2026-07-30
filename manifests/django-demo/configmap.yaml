@@ -11,3 +11,30 @@ data:
   DJANGO_ALLOWED_HOSTS: "django-demo.k3s.home.verrve.ru,django-demo.local,localhost,127.0.0.1"
   ALLOWED_HOSTS: "django-demo.k3s.home.verrve.ru,django-demo.local,localhost,127.0.0.1"
   PORT: "8000"
+  CSRF_TRUSTED_ORIGINS: "https://django-demo.k3s.home.verrve.ru,https://django-demo.k3s.home.verrve.ru:443,http://django-demo.k3s.home.verrve.ru,http://django-demo.k3s.home.verrve.ru:80"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-default-conf
+  namespace: django-demo
+  labels:
+    app.kubernetes.io/part-of: django-demo
+    app.kubernetes.io/component: static
+    app.kubernetes.io/name: django-demo-nginx
+data:
+  default.conf: |
+    server {
+      listen 80 default_server;
+      server_name _;
+      root /usr/share/nginx/html;
+      location / {
+        return 404;
+      }
+      location /static/ {access_log off;
+        log_not_found off;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri $uri/ =404;
+      }
+    }

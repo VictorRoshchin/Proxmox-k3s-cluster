@@ -39,3 +39,6 @@ destroy:
 clean-generated:
 	rm -f $(ANSIBLE_INVENTORY)
 	rm -f ansible/artifacts/k3s.yaml
+
+k9s:
+	docker run --rm -it -v ./ansible/artifacts:/root/.kube/config derailed/k9s:v0.50.18 --kubeconfig /root/.kube/config/k3s.yaml

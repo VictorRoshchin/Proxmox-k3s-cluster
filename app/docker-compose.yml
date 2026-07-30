@@ -1,0 +1,21 @@
+services:
+  app:
+    image: verrve/django-demo:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8888:8000"
+    environment:
+      DATABASE_URL: postgresql://djangodemouser:gYwOKJZaR0do8TUUgPS9@db:5432/djangodemodb
+      DEBUG: true
+    #volumes:
+    #  - ../volumes/application:/application
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: djangodemodb
+      POSTGRES_USER: djangodemouser
+      POSTGRES_PASSWORD: gYwOKJZaR0do8TUUgPS9
+      POSTGRES_PORT: 5432
+    volumes:
+      - ../volumes/postgresql:/var/lib/postgresql

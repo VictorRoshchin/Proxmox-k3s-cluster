@@ -9,3 +9,4 @@ resources:
   - http-redirect-middleware.yaml
   - ingress.yaml
   - hpa.yaml
+  - statefulset.yaml

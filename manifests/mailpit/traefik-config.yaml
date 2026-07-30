@@ -1,0 +1,15 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+
+spec:
+  valuesContent: |
+    ports:
+      smtp:
+        port: 1025
+        expose:
+          default: true
+        exposedPort: 1025
+        protocol: TCP

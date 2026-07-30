@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: mailpit-redirect-https
+  namespace: mailpit
+  labels:
+    app.kubernetes.io/name: mailpit
+    app.kubernetes.io/part-of: infra
+    app.kubernetes.io/component: web
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

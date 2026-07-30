@@ -16,3 +16,46 @@ spec:
       port: 80
       targetPort: http
       protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-demo-postgres
+  namespace: django-demo
+  labels:
+    app.kubernetes.io/name: django-demo-postgres
+    app.kubernetes.io/part-of: web
+    app.kubernetes.io/component: database
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: django-demo-postgres
+    app.kubernetes.io/part-of: web
+    app.kubernetes.io/component: database
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-demo-nginx
+  namespace: django-demo
+  labels:
+    app.kubernetes.io/part-of: django-demo
+    app.kubernetes.io/component: static
+    app.kubernetes.io/name: django-demo-nginx
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/part-of: django-demo
+    app.kubernetes.io/component: static
+    app.kubernetes.io/name: django-demo-nginx
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+
